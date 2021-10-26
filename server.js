@@ -4,8 +4,8 @@ import Messages from "./dbModel.js";
 // app config
 const app = express();
 const port = process.env.PORT || 9000;
-
 // middle layers (Password --> EhLS71eo4CvjYQbU)
+app.use(express.json());
 
 // DB Config
 const connection_url = "mongodb+srv://admin:EhLS71eo4CvjYQbU@cluster0.fkebv.mongodb.net/webCommunity?retryWrites=true&w=majority"
@@ -21,7 +21,7 @@ app.get("/", (req, res) => res.status(200).send("Hello People, Welcome to the We
 app.post("/v2/posts", (req, res) => {
 
     const dbMessages = req.body;
-    console.log(dbMessages);
+
     Messages.create(dbMessages, (err, data) => {
         if (err) {
             res.status(500).send(err);
@@ -30,5 +30,15 @@ app.post("/v2/posts", (req, res) => {
         }
     })
 });
+
+app.get("/v2/posts", (req, res) => {
+    Messages.find((err, data) => { // Messages.find({filter}, (error handling))
+        if (err) {
+            res.status(500).send(err);
+        } else {
+            res.status(200).send(data);
+        }
+    });
+})
 
 app.listen(port, () => console.log(`Listening to the Port ${port}`));

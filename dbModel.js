@@ -4,7 +4,7 @@ const dbSchema = mongoose.Schema({
     channel: String,
     message: String,
     email: String,
-    userName: String
+    userName: String,
 });
 
 // Collection inside the Database
