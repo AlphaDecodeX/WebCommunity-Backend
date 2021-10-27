@@ -6,7 +6,10 @@ const app = express();
 const port = process.env.PORT || 9000;
 // middle layers (Password --> EhLS71eo4CvjYQbU)
 app.use(express.json());
-
+app.use((req, res, next) => {
+    res.setHeader("Access-Control-Allow-Origin", "*");
+    res.setHeader("Access-Control-Allow-Headers", "*");
+})
 // DB Config
 const connection_url = "mongodb+srv://admin:EhLS71eo4CvjYQbU@cluster0.fkebv.mongodb.net/webCommunity?retryWrites=true&w=majority"
 mongoose.connect(connection_url, {
