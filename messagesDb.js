@@ -7,8 +7,7 @@ const dbSchema = mongoose.Schema({
             username: String,
             messages: [
                 {
-                    date: String,
-                    timeStamp: String,
+                    dateTime: Date,
                     message: String
                 }
             ]

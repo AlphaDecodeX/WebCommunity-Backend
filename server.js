@@ -2,7 +2,6 @@ import express from 'express';
 import mongoose from "mongoose";
 import messagesDb from "./messagesDb.js";
 import Cors from 'cors';
-import channelsDb from './channelsDb.js';
 
 // app config
 const app = express();
@@ -23,24 +22,21 @@ mongoose.connect(connection_url, {
 
 // Initializing User specific Database after SignUp
 app.post('/signUpUser', (req, res) => {
-    const data = req.body; // {username: "", channels: ["", ""]}
+    const data = req.body; // {username: "", channel: ""}
 
-    for (let channel in data.channels) {
-        console.log(data.channels[channel]);
-        messagesDb.findOneAndUpdate(
-            { channel: data.channels[channel] },
-            { "$push": { globalMessages: { username: data.username } } },
-            (err, data) => {
-                if (err) {
-                    res.status(500).send(err);
-                } else {
-                    res.status(200).send(data);
-                }
+    messagesDb.findOneAndUpdate(
+        { channel: data.channel },
+        { "$push": { globalMessages: { username: data.username } } },
+        (err, data) => {
+            if (err) {
+                res.status(500).send(err);
+            } else {
+                res.status(200).send(data);
             }
-        );
-    }
-
-});
+        }
+    );
+}
+);
 
 // Creating Channels.....
 app.post('/createChannel', (req, res) => {
@@ -58,7 +54,6 @@ app.post('/createChannel', (req, res) => {
 })
 
 // Getting Messages data
-
 app.get('/getChannelMessages', (req, res) => {
     const data = req.body; // {channel: ""}
     messagesDb.find({ channel: data.channel }, (err, data) => {
@@ -72,16 +67,30 @@ app.get('/getChannelMessages', (req, res) => {
 
 // Sending a Message
 
-// app.post('/postChannelMessages', (req, res) => {
-//     const data = req.body; 
-//     // {channel: "", username: "", message: "", date: "", timestamp: ""}
-//     const dataToBeInserted = {
-//         channel: data.channel,
-//         globalMessages: [
-//             {}
-//         ]
-//     }
-//     messagesDb.create()        
-// })
+app.post('/postChannelMessages', (req, res) => {
+    const data = req.body;
+    // {channel: "", username: "", message: "", dateTime: Date()}
+    messagesDb.findOneAndUpdate(
+        {
+            channel: data.channel,
+            "globalMessages.username": data.username
+        },
+        {
+            "$push": {
+                "globalMessages.$.messages": {
+                    dateTime: new Date(),
+                    message: data.message
+                }
+            }
+        },
+        (err, data) => {
+            if (err) {
+                res.status(500).send(err);
+            } else {
+                res.status(201).send(data);
+            }
+        }
+    );
+})
 
 app.listen(port, () => console.log(`Listening to the Port ${port}`));
