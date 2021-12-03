@@ -2,6 +2,7 @@ import express from 'express';
 import mongoose from "mongoose";
 import messagesDb from "./messagesDb.js";
 import Cors from 'cors';
+import usersDb from "./usersDb.js"
 
 // app config
 const app = express();
@@ -20,8 +21,32 @@ mongoose.connect(connection_url, {
 
 // API EndPoints
 
+// Upload Usernames
+app.post("/addUser", (req, res) => {
+    const data = req.body; // {"userName": ""}
+    console.log(data);
+    usersDb.create({ username: data.userName }, (err, data) => {
+        if (err) {
+            res.status(500).send(err);
+        } else {
+            res.status(201).send(data);
+        }
+    })
+})
+
+// Get Usernames
+app.get("/getUsers", (req, res) => {
+    usersDb.find((err, data) => {
+        if (err) {
+            res.status(500).send(err);
+        } else {
+            res.status(201).send(data);
+        }
+    })
+})
+
 // Initializing User specific Database after SignUp
-app.post('/signUpUser', (req, res) => {
+app.post('/loginNewUser', (req, res) => {
     const data = req.body; // {username: "", channel: ""}
 
     messagesDb.findOneAndUpdate(
